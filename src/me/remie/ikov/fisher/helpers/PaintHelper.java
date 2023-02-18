@@ -1,6 +1,6 @@
-package me.remie.ikov.template.helpers;
+package me.remie.ikov.fisher.helpers;
 
-import me.remie.ikov.template.TemplateScript;
+import me.remie.ikov.fisher.FisherScript;
 import simple.api.ClientAccessor;
 import simple.api.ClientContext;
 
@@ -23,7 +23,7 @@ public class PaintHelper extends ClientAccessor<ClientContext> {
     /**
      * This field stores the script instance.
      */
-    private final TemplateScript script;
+    private final FisherScript script;
 
     /**
      * This field stores the name of the script from the manifest.
@@ -39,8 +39,8 @@ public class PaintHelper extends ClientAccessor<ClientContext> {
     private final int MAX_PAINT_WIDTH = 200;
     private final int MAX_PAINT_HEIGHT = 100;
     private final List<Callable<String>> lines = new ArrayList<>();
-    private final Color PAINT_TEXT_COLOR = Color.decode("#e4b734");
-    private final Color PAINT_OUTLINE_COLOR = Color.decode("#999999");
+    private final Color PAINT_TEXT_COLOR = Color.decode("#33caff");
+    private final Color PAINT_OUTLINE_COLOR = Color.decode("#0e3c7f");
     private final Color PAINT_BACKGROUND_COLOR = new Color(0, 0, 0, 220);
     private final Rectangle PAINT_BOUNDS = new Rectangle(5, 2, MAX_PAINT_WIDTH, MAX_PAINT_HEIGHT);
     private int versionTitleXPos = -1;
@@ -51,7 +51,7 @@ public class PaintHelper extends ClientAccessor<ClientContext> {
      *
      * @param script The script instance.
      */
-    public PaintHelper(final TemplateScript script) {
+    public PaintHelper(final FisherScript script) {
         super(script.ctx);
         this.script = script;
         this.scriptName = script.getName();
@@ -64,7 +64,7 @@ public class PaintHelper extends ClientAccessor<ClientContext> {
 
     /**
      * This method is called every time the paint is drawn.
-     * This method is called by the {@link TemplateScript#onPaint(Graphics2D)} method.
+     * This method is called by the {@link FisherScript#onPaint(Graphics2D)} method.
      *
      * @param g the graphics object to draw with
      */
@@ -140,7 +140,7 @@ public class PaintHelper extends ClientAccessor<ClientContext> {
 
     /**
      * Handles mouse clicks for the paint. When the user clicks on the paint, it will toggle the paint on and off.
-     * This method is called by the {@link TemplateScript#mouseClicked(MouseEvent)} method.
+     * This method is called by the {@link FisherScript#mouseClicked(MouseEvent)} method.
      *
      * @param e the mouse event
      */

@@ -1,8 +1,8 @@
-package me.remie.ikov.template.tasks;
+package me.remie.ikov.fisher.tasks;
 
-import me.remie.ikov.template.TemplateScript;
-import me.remie.ikov.template.data.TemplateSettings;
-import me.remie.ikov.template.data.TemplateState;
+import me.remie.ikov.fisher.FisherScript;
+import me.remie.ikov.fisher.data.FisherSettings;
+import me.remie.ikov.fisher.data.FisherState;
 import simple.api.script.task.Task;
 
 /**
@@ -11,11 +11,11 @@ import simple.api.script.task.Task;
  * @author Seth Davis <sethdavis321@gmail.com>
  * @Discord Reminisce#1707 <138751815847116800>
  */
-public abstract class TemplateTask extends Task {
+public abstract class FisherTask extends Task {
 
-    public final TemplateScript script;
+    public final FisherScript script;
 
-    public TemplateTask(TemplateScript script) {
+    public FisherTask(FisherScript script) {
         super(script.ctx);
         this.script = script;
     }
@@ -25,7 +25,7 @@ public abstract class TemplateTask extends Task {
      *
      * @return the script instance.
      */
-    public TemplateScript getScript() {
+    public FisherScript getScript() {
         return script;
     }
 
@@ -34,7 +34,7 @@ public abstract class TemplateTask extends Task {
      *
      * @return the settings instance.
      */
-    public TemplateSettings getSettings() {
+    public FisherSettings getSettings() {
         return script.getSettings();
     }
 
@@ -43,7 +43,7 @@ public abstract class TemplateTask extends Task {
      *
      * @return the state instance.
      */
-    public TemplateState getState() {
+    public FisherState getState() {
         return script.getState();
     }
 

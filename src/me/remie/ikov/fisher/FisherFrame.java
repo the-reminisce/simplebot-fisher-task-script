@@ -1,12 +1,11 @@
-package me.remie.ikov.template;
+package me.remie.ikov.fisher;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import me.remie.ikov.template.data.TemplateSettings;
-import me.remie.ikov.template.types.OffensivePrayer;
+import me.remie.ikov.fisher.data.FisherSettings;
+import me.remie.ikov.fisher.types.FishingSpot;
 import simple.api.ClientContext;
 import simple.api.filters.SimpleSkills;
-import simple.api.wrappers.SimpleItem;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -18,8 +17,6 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Reminisce on Feb 15, 2023 at 10:30 PM
@@ -27,14 +24,16 @@ import java.util.List;
  * @author Seth Davis <sethdavis321@gmail.com>
  * @Discord Reminisce#1707 <138751815847116800>
  */
-public class TemplateFrame extends JFrame {
+public class FisherFrame extends JFrame {
 
     private final ClientContext ctx;
-    private final TemplateScript script;
+    private final FisherScript script;
 
-    private JComboBox<OffensivePrayer> primaryOffensivePrayerComboBox;
+    private JCheckBox powerFishingCheckBox;
+    private JCheckBox progressiveFishingCheckBox;
+    private JComboBox<FishingSpot> fishingSpotComboBox;
 
-    public TemplateFrame(final TemplateScript script) {
+    public FisherFrame(final FisherScript script) {
         this.script = script;
         this.ctx = script.ctx;
         initComponents();
@@ -54,18 +53,33 @@ public class TemplateFrame extends JFrame {
 
         generalPanel.setBorder(new EmptyBorder(5, 5, 0, 5));
 
-        generalPanel.setLayout(new GridLayout(2, 1));
+        generalPanel.setLayout(new GridLayout(6, 1));
 
-        JLabel foodLabel = new JLabel("Attack spinners: ");
-        foodLabel.setToolTipText("If you want to attack spinners");
-        generalPanel.add(foodLabel);
+        JLabel powerFishingLabel = new JLabel("Power Fishing: ");
+        powerFishingLabel.setToolTipText("If you want to power fish");
+        generalPanel.add(powerFishingLabel);
 
-        JLabel primaryPrayerLabel = new JLabel("Offensive Prayer: ");
-        primaryPrayerLabel.setToolTipText("The offensive prayer you want to use for the portals/spinners in the pest control game.");
-        generalPanel.add(primaryPrayerLabel);
+        powerFishingCheckBox = new JCheckBox();
+        generalPanel.add(powerFishingCheckBox);
 
-        primaryOffensivePrayerComboBox = new JComboBox<>(OffensivePrayer.values());
-        generalPanel.add(primaryOffensivePrayerComboBox);
+        JLabel progressiveFishingLabel = new JLabel("Progressive Fishing: ");
+        progressiveFishingLabel.setToolTipText("If you want to progressive fish");
+        generalPanel.add(progressiveFishingLabel);
+
+        progressiveFishingCheckBox = new JCheckBox();
+        generalPanel.add(progressiveFishingCheckBox);
+
+        JLabel fishingSpotLabel = new JLabel("Fishing Spot: ");
+        fishingSpotLabel.setToolTipText("The fishing spot you want to fish at");
+        generalPanel.add(fishingSpotLabel);
+
+        fishingSpotComboBox = new JComboBox<>(FishingSpot.values());
+        generalPanel.add(fishingSpotComboBox);
+
+        //We're adding an action listener to the progressive fishing checkbox
+        //If it's selected, we disable the fishing spot combo box
+        //If it's not selected, we enable the fishing spot combo box
+        progressiveFishingCheckBox.addActionListener(e -> fishingSpotComboBox.setEnabled(!progressiveFishingCheckBox.isSelected()));
 
         JPanel infoPanel = new JPanel();
         tabbedPane.addTab("Info", infoPanel);
@@ -78,7 +92,7 @@ public class TemplateFrame extends JFrame {
         infoTextArea.setContentType("text/html");
         infoTextArea.setEditable(false);
         infoTextArea.setPreferredSize(new Dimension(500, 200));
-        infoTextArea.setText("Template script for Ikov.");
+        infoTextArea.setText("Catherby fishing script for Ikov.");
         infoTextArea.setCaretPosition(0);
         infoScrollPane.setViewportView(infoTextArea);
 
@@ -109,54 +123,20 @@ public class TemplateFrame extends JFrame {
     }
 
     /**
-     * @return
+     * Starts the script with the current settings
      */
-    private List<String> getEquipment() {
-        final List<String> equipment = new ArrayList<>();
-        for (SimpleItem item : ctx.equipment.populate()) {
-            if (item == null) {
-                continue;
-            }
-            equipment.add(item.getName());
-        }
-        return equipment;
-    }
-
-    private void loadCurrentEquipment(DefaultListModel<String> model) {
-        final List<String> equipment = getEquipment();
-        model.clear();
-        for (String item : equipment) {
-            model.addElement(item);
-        }
-    }
-
     public void startScript() {
-        final OffensivePrayer primaryPrayer = (OffensivePrayer) primaryOffensivePrayerComboBox.getSelectedItem();
-        if (primaryPrayer == null) {
-            JOptionPane.showMessageDialog(this, "You must select a primary offensive prayer.");
-            return;
-        }
-        if (primaryPrayer != OffensivePrayer.NONE) {
-            if (ctx.skills.getRealLevel(SimpleSkills.Skill.PRAYER) < primaryPrayer.getPrayer().getLevel()) {
-                JOptionPane.showMessageDialog(this, "You must have a prayer level of " + primaryPrayer.getPrayer().getLevel() + " to use " + primaryPrayer.getName() + ".");
-                return;
-            }
-        }
+        final boolean progressiveFishing = progressiveFishingCheckBox.isSelected();
+        final FishingSpot fishingSpot = (FishingSpot) fishingSpotComboBox.getSelectedItem();
 
-        final boolean cursesEnabled = primaryPrayer.ordinal() >= 7;
-        if (cursesEnabled) {
-            if (ctx.skills.getRealLevel(SimpleSkills.Skill.PRAYER) < 71) {
-                JOptionPane.showMessageDialog(this, "You must have a prayer level of 71 to use deflect from melee.");
-                return;
-            }
-        } else {
-            if (ctx.skills.getRealLevel(SimpleSkills.Skill.PRAYER) < 43) {
-                JOptionPane.showMessageDialog(this, "You must have a prayer level of 43 to use protect from melee.");
+        if (!progressiveFishing) {
+            if (fishingSpot.getRequiredLevel() > ctx.skills.getLevel(SimpleSkills.Skill.FISHING)) {
+                JOptionPane.showMessageDialog(this, "You need a fishing level of " +
+                                fishingSpot.getRequiredLevel() + " to fish for " + fishingSpot.getName() + ".",
+                        "Insufficient Fishing Level", JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
-
-        script.getState().setCursesPrayerEnabled(cursesEnabled);
         script.startScript(getSettings());
     }
 
@@ -165,11 +145,13 @@ public class TemplateFrame extends JFrame {
      *
      * @return the settings object
      */
-    private TemplateSettings getSettings() {
+    private FisherSettings getSettings() {
         try {
-            final OffensivePrayer primaryPrayer = (OffensivePrayer) primaryOffensivePrayerComboBox.getSelectedItem();
+            final boolean powerFishing = powerFishingCheckBox.isSelected();
+            final boolean progressiveFishing = progressiveFishingCheckBox.isSelected();
+            final FishingSpot fishingSpot = (FishingSpot) fishingSpotComboBox.getSelectedItem();
 
-            final TemplateSettings settings = new TemplateSettings(primaryPrayer);
+            final FisherSettings settings = new FisherSettings(fishingSpot, powerFishing, progressiveFishing);
             return settings;
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,7 +164,7 @@ public class TemplateFrame extends JFrame {
      */
     private void saveSettings() {
         try {
-            final TemplateSettings settings = getSettings();
+            final FisherSettings settings = getSettings();
 
             final File scriptDirectory = script.getStorageDirectory();
 
@@ -229,7 +211,7 @@ public class TemplateFrame extends JFrame {
                     selectedFile = new File(selectedFile.getAbsolutePath() + ".json");
                 }
                 final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                final TemplateSettings settings = gson.fromJson(new FileReader(selectedFile), TemplateSettings.class);
+                final FisherSettings settings = gson.fromJson(new FileReader(selectedFile), FisherSettings.class);
 
 
                 setupFromSettings(settings);
@@ -239,8 +221,10 @@ public class TemplateFrame extends JFrame {
         }
     }
 
-    private void setupFromSettings(final TemplateSettings settings) {
-        primaryOffensivePrayerComboBox.setSelectedItem(settings.getOffensivePrayer());
+    private void setupFromSettings(final FisherSettings settings) {
+        powerFishingCheckBox.setSelected(settings.isPowerFishing());
+        progressiveFishingCheckBox.setSelected(settings.isProgressiveFishing());
+        fishingSpotComboBox.setSelectedItem(settings.getFishingSpot());
     }
 
     /**
