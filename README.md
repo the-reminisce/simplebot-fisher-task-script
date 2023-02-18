@@ -1,4 +1,4 @@
-# simplebot-fhsing-task-script
+# simplebot-fishing-task-script
 ## Introduction
 This repository is based on the [simplebot-task-script-template](https://github.com/the-reminisce/simplebot-task-script-template) repository
 
@@ -12,7 +12,7 @@ The `FisherConstants` class holds any constants that the script uses to define s
 
 The `FisherSettings` class holds the settings for the script.
 
-The `FisherState` class holds the state variables for the script. This includes information such as the current task, the time that the script started, and any other variables that need to be tracked throughout the execution of the script. The `FisherState` class also has a method for generating random numbers in a normal distribution, which can be useful for adding some randomness to your script.
+The `FisherState` class holds the state variables for the script. This includes information such as the current task, the time that the script started, and any other variables that need to be tracked throughout the execution of the script. This class also has a method for generating random numbers in a normal distribution, which can be useful for adding some randomness to your script.
 
 The `FisherTask` class is a template for a task that can be added to the task system. It provides access to the script instance, settings, and state, allowing you to perform actions and make decisions based on the current state of the script.
 
